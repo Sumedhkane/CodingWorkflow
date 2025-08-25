@@ -1,35 +1,29 @@
-Step 4. Self-Check
+Step 8. Functional & Performance Tests
 
-Purpose: Developer validates own work
+Purpose: Validate correctness & runtime
 
-Checklist: No SELECT *, clear aliases, edge case handling, performance-friendly, rollback defined
+Checklist: Test matrix executed (happy path, edge cases, nulls, multi-entity). Runtime benchmarks recorded
 
-Responsibility: Author
+Responsibility: Author + Reviewer
 
-Example: Found SELECT * → fixed to SELECT cost_center_id, amount. Added COALESCE(amount,0) for null safety.
+Example: Test: Input = 10 entities, 24 periods → runtime < 15 sec. Output totals match expected finance numbers.
 
-Step 5. Peer Review
+Step 9. Approver Sign-off
 
-Purpose: Independent quality control
+Purpose: Final accountability
 
-Checklist: 1 reviewer minimum (2 for critical SQL). Checks:
+Checklist: Reviewer approval confirmed, tests passed, changelog entry updated
 
-Code Quality (naming, formatting, readability, comments)
+Responsibility: Approver (Team Lead / Module Owner)
 
-Business Logic (joins correct, null handling, aggregations accurate, no misuse of DISTINCT)
+Example: Approver notes: “Validated for Entity JP01 and CMG mapping. Safe to promote.”
 
-Performance & Safety (filters early, avoid Cartesian joins, runtime acceptable, re-run safe)
+End: Code Ready
 
-Responsibility: Peer Reviewer(s)
+Purpose: Safe for integration
 
-Example: Reviewer comment: “DISTINCT used to remove dupes. Should fix join condition instead.”
+Checklist: Traceability complete, documentation updated
 
-Step 6. Reviewer Approval
+Responsibility: Approver
 
-Purpose: Ensure peer validation loop
-
-Checklist: Reviewer either approves or sends back with comments
-
-Responsibility: Reviewer
-
-Example: PR marked “Approved” in GitHub / Tagetik repo after issues fixed
+Example: Change log entry: Ticket #1234 — Fixed CMG join logic in P&L query, reviewed & tested.
