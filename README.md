@@ -1,116 +1,39 @@
-# CodingWorkflow
-CodingWorkflow
+Row: Ticket Created
 
-Step 1. Ticket Created
+Purpose: establish scope, impact area(s), rollback.
 
-Purpose: Define scope & accountability
+Checklist: business context, affected forms/ETLs/reports, risk level, rollback path.
 
-Checklist: Scope, impact, rollback documented
+Responsibility: Author/Requester.
 
-Responsibility: Author / Requester
+Example: “Bug: CMG mapping double counts for JP01 Q2; rollback = revert to tag v1.8.”
 
-Example: Ticket: “Fix P&L allocation query for Entity X Q2” → rollback plan = revert to last approved version
+Row: Design Note (Enhancement)
 
-Step 2. Design Note Prepared
+Purpose: capture intended logic before coding.
 
-Purpose: Capture logic before coding
+Checklist: inputs (schema.table), joins/filters, outputs with 5–10 sample rows, edge cases, rollback.
 
-Checklist: Inputs/outputs, joins, edge cases, rollback plan
+Responsibility: Author; sanity check by peer.
 
-Responsibility: Author, sanity-checked by Peer
+Example: “Input fct_gl join dim_cmg on cmg_id; output P&L by cmg, period; handle NULL cmg_id → ‘UNASSIGNED’.”
 
-Example: Note: Input = FCT_GL, Join on cost_center_id, Output = P&L by CMG. Handle null period_id by defaulting to ‘9999’.
+Row: Reproduce Issue (Maintenance)
 
-Step 3. Write SQL (Style Guide)
+Purpose: prove the bug with minimal data.
 
-Purpose: Consistent, maintainable code
+Checklist: exact query, params (entity/period), expected vs actual, sample rows that fail.
 
-Checklist: Naming conventions, explicit JOINs, null handling, WHY comments, idempotent
+Responsibility: Author.
 
-Responsibility: Author
+Example: “For JP01 2025-Q2, cost_center 1102 appears twice after join to dim_proj.”
 
-Example:
+Row: Root Cause Isolation (Maintenance)
 
-WITH cost_by_period AS (
-  SELECT cost_center_id, period_id, SUM(amount) AS total_cost
-  FROM fct_gl
-  WHERE period_id BETWEEN '2025Q1' AND '2025Q2'
-  GROUP BY cost_center_id, period_id
-)
+Purpose: pinpoint failing logic.
 
+Checklist: row-count diffs per join, check DISTINCT usage, null/period boundary, non-sargable predicates.
 
-Step 4. Self-Check
+Responsibility: Author + Reviewer (discussion).
 
-Purpose: Developer validates own work
-
-Checklist: No SELECT *, clear aliases, edge case handling, performance-friendly, rollback defined
-
-Responsibility: Author
-
-Example: Found SELECT * → fixed to SELECT cost_center_id, amount. Added COALESCE(amount,0) for null safety.
-
-Step 5. Peer Review
-
-Purpose: Independent quality control
-
-Checklist: 1 reviewer minimum (2 for critical SQL). Checks:
-
-Code Quality (naming, formatting, readability, comments)
-
-Business Logic (joins correct, null handling, aggregations accurate, no misuse of DISTINCT)
-
-Performance & Safety (filters early, avoid Cartesian joins, runtime acceptable, re-run safe)
-
-Responsibility: Peer Reviewer(s)
-
-Example: Reviewer comment: “DISTINCT used to remove dupes. Should fix join condition instead.”
-
-Step 6. Reviewer Approval
-
-Purpose: Ensure peer validation loop
-
-Checklist: Reviewer either approves or sends back with comments
-
-Responsibility: Reviewer
-
-Example: PR marked “Approved” in GitHub / Tagetik repo after issues fixed
-
-Step 7. Static / Lint Checks
-
-Purpose: Automated guardrails
-
-Checklist: Style violations, anti-pattern detection
-
-Responsibility: Reviewer / System
-
-Example: SQL Linter flags: mixed casing → corrected to consistent UPPERCASE keywords
-
-Step 8. Functional & Performance Tests
-
-Purpose: Validate correctness & runtime
-
-Checklist: Test matrix executed (happy path, edge cases, nulls, multi-entity). Runtime benchmarks recorded
-
-Responsibility: Author + Reviewer
-
-Example: Test: Input = 10 entities, 24 periods → runtime < 15 sec. Output totals match expected finance numbers.
-
-Step 9. Approver Sign-off
-
-Purpose: Final accountability
-
-Checklist: Reviewer approval confirmed, tests passed, changelog entry updated
-
-Responsibility: Approver (Team Lead / Module Owner)
-
-Example: Approver notes: “Validated for Entity JP01 and CMG mapping. Safe to promote.”
-
-End: Code Ready
-
-Purpose: Safe for integration
-
-Checklist: Traceability complete, documentation updated
-
-Responsibility: Approver
-
-Example: Change log entry: Ticket #1234 — Fixed CMG join logic in P&L query, reviewed & tested.
+Example: “LEFT JOIN on (cc_id, period_id) missing period predicate → dupes.”
