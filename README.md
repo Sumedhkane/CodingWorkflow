@@ -1,29 +1,35 @@
-Step 1. Ticket Created
+Step 4. Self-Check
 
-Purpose: Define scope & accountability
+Purpose: Developer validates own work
 
-Checklist: Scope, impact, rollback documented
-
-Responsibility: Author / Requester
-
-Example: Ticket: “Fix P&L allocation query for Entity X Q2” → rollback plan = revert to last approved version
-
-Step 2. Design Note Prepared
-
-Purpose: Capture logic before coding
-
-Checklist: Inputs/outputs, joins, edge cases, rollback plan
-
-Responsibility: Author, sanity-checked by Peer
-
-Example: Note: Input = FCT_GL, Join on cost_center_id, Output = P&L by CMG. Handle null period_id by defaulting to ‘9999’.
-
-Step 3. Write SQL (Style Guide)
-
-Purpose: Consistent, maintainable code
-
-Checklist: Naming conventions, explicit JOINs, null handling, WHY comments, idempotent
+Checklist: No SELECT *, clear aliases, edge case handling, performance-friendly, rollback defined
 
 Responsibility: Author
 
-Example:
+Example: Found SELECT * → fixed to SELECT cost_center_id, amount. Added COALESCE(amount,0) for null safety.
+
+Step 5. Peer Review
+
+Purpose: Independent quality control
+
+Checklist: 1 reviewer minimum (2 for critical SQL). Checks:
+
+Code Quality (naming, formatting, readability, comments)
+
+Business Logic (joins correct, null handling, aggregations accurate, no misuse of DISTINCT)
+
+Performance & Safety (filters early, avoid Cartesian joins, runtime acceptable, re-run safe)
+
+Responsibility: Peer Reviewer(s)
+
+Example: Reviewer comment: “DISTINCT used to remove dupes. Should fix join condition instead.”
+
+Step 6. Reviewer Approval
+
+Purpose: Ensure peer validation loop
+
+Checklist: Reviewer either approves or sends back with comments
+
+Responsibility: Reviewer
+
+Example: PR marked “Approved” in GitHub / Tagetik repo after issues fixed
