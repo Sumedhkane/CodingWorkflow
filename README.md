@@ -1,29 +1,29 @@
-Step 8. Functional & Performance Tests
+Row: Reproduce Issue (Maintenance)
 
-Purpose: Validate correctness & runtime
+Purpose: prove the bug with minimal data.
 
-Checklist: Test matrix executed (happy path, edge cases, nulls, multi-entity). Runtime benchmarks recorded
+Checklist: exact query, params (entity/period), expected vs actual, sample rows that fail.
 
-Responsibility: Author + Reviewer
+Responsibility: Author.
 
-Example: Test: Input = 10 entities, 24 periods → runtime < 15 sec. Output totals match expected finance numbers.
+Example: “For JP01 2025-Q2, cost_center 1102 appears twice after join to dim_proj.”
 
-Step 9. Approver Sign-off
+Row: Root Cause Isolation (Maintenance)
 
-Purpose: Final accountability
+Purpose: pinpoint failing logic.
 
-Checklist: Reviewer approval confirmed, tests passed, changelog entry updated
+Checklist: row-count diffs per join, check DISTINCT usage, null/period boundary, non-sargable predicates.
 
-Responsibility: Approver (Team Lead / Module Owner)
+Responsibility: Author + Reviewer (discussion).
 
-Example: Approver notes: “Validated for Entity JP01 and CMG mapping. Safe to promote.”
+Example: “LEFT JOIN on (cc_id, period_id) missing period predicate → dupes.”
 
-End: Code Ready
+Regression Pack (Maintenance)
 
-Purpose: Safe for integration
+Purpose: confirm the fix and nearby logic remain stable.
 
-Checklist: Traceability complete, documentation updated
+Checklist: original failing case passes; adjacent entities/periods stable; totals unchanged where expected.
 
-Responsibility: Approver
+Responsibility: Author + Reviewer.
 
-Example: Change log entry: Ticket #1234 — Fixed CMG join logic in P&L query, reviewed & tested.
+Example: “Bug case JP01-Q2 fixed; JP02/US01 unaffected; total P&L equals prior release.”
